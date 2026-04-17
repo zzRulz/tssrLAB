@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>damien@lenormand:~$ portfolio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ───────────────────────────────────────────────── */
+  /*  EDIT MODE DEFAULTS                               */
+  /* ───────────────────────────────────────────────── */
+  /* tweakable values are read from this JSON block     */
+  /* ───────────────────────────────────────────────── */
+</style>
+<script>
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "accent": "green",
+    "theme": "dark",
+    "density": "comfortable",
+    "hero_title": "sysadmin \/ infra-ops",
+    "show_blink_cursor": true
+  }/*EDITMODE-END*/;
+</script>
+<style>
+  :root {
+    --accent-green: #7fe67f;
+    --accent-green-dim: #3a6b3a;
+    --accent-amber: #ffb454;
+    --accent-amber-dim: #7a5420;
+    --accent-cyan: #7fd4e6;
+    --accent-cyan-dim: #3a606b;
+    --accent-magenta: #e67fc4;
+    --accent-magenta-dim: #6b3a58;
+
+    --accent: var(--accent-green);
+    --accent-dim: var(--accent-green-dim);
+
+    /* dark theme */
+    --bg: #0c0d0a;
+    --bg-2: #141512;
+    --bg-3: #1c1d19;
+    --fg: #d4d2c8;
+    --fg-dim: #8a887e;
+    --fg-faint: #4a4840;
+    --border: #2a2b26;
+    --border-bright: #3d3e38;
+    --red: #e67f7f;
+    --yellow: #e6d47f;
+    --blue: #7fa8e6;
+    --purple: #b87fe6;
+
+    --gap-s: 6px;
+    --gap-m: 12px;
+    --gap-l: 24px;
+    --gap-xl: 48px;
+
+    --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+    --fs-xs: 11px;
+    --fs-sm: 13px;
+    --fs-base: 14px;
+    --fs-md: 16px;
+    --fs-lg: 20px;
+    --fs-xl: 28px;
+    --fs-2xl: 44px;
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f4f2ec;
+    --bg-2: #ebe8df;
+    --bg-3: #e1ddd1;
+    --fg: #1a1b18;
+    --fg-dim: #5a584e;
+    --fg-faint: #908d82;
+    --border: #cdc9bc;
+    --border-bright: #b5b1a3;
+    --accent-green: #3d7a3d;
+    --accent-green-dim: #8ab08a;
+    --accent-amber: #a66818;
+    --accent-amber-dim: #d4a76a;
+    --accent-cyan: #2d6b7a;
+    --accent-cyan-dim: #8ab5bf;
+    --accent-magenta: #8a3a6b;
+    --accent-magenta-dim: #c08aa8;
+  }
+
+  :root[data-accent="amber"]   { --accent: var(--accent-amber);   --accent-dim: var(--accent-amber-dim); }
+  :root[data-accent="cyan"]    { --accent: var(--accent-cyan);    --accent-dim: var(--accent-cyan-dim); }
+  :root[data-accent="magenta"] { --accent: var(--accent-magenta); --accent-dim: var(--accent-magenta-dim); }
+
+  :root[data-density="compact"]    { --gap-l: 16px; --gap-xl: 28px; }
+  :root[data-density="spacious"]   { --gap-l: 36px; --gap-xl: 72px; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: var(--fs-base);
+    line-height: 1.55;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Scanline + subtle grain background ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 3px,
+      rgba(255,255,255,0.012) 3px,
+      rgba(255,255,255,0.012) 4px
+    );
+    z-index: 1000;
+    mix-blend-mode: overlay;
+  }
+  :root[data-theme="light"] body::before { opacity: 0.4; mix-blend-mode: multiply; }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ────────────────────────────────────────── */
+  /*  TOP CHROME: mimic a terminal window       */
+  /* ────────────────────────────────────────── */
+  .chrome {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--gap-l);
+    height: 32px;
+    font-size: var(--fs-xs);
+    color: var(--fg-dim);
+    gap: var(--gap-m);
+  }
+  .chrome-dots { display: flex; gap: 6px; }
+  .chrome-dots span {
+    width: 11px; height: 11px; border-radius: 50%;
+    background: var(--border-bright);
+  }
+  .chrome-dots span:nth-child(1) { background: #e06c6c; }
+  .chrome-dots span:nth-child(2) { background: #e6c06c; }
+  .chrome-dots span:nth-child(3) { background: #7fbf6c; }
+  .chrome-title {
+    flex: 1;
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+  .chrome-title b { color: var(--fg); font-weight: 500; }
+  .chrome-status {
+    display: flex;
+    gap: var(--gap-m);
+    font-variant-numeric: tabular-nums;
+  }
+  .chrome-status .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 4px;
+    vertical-align: middle;
+    box-shadow: 0 0 6px var(--accent);
+  }
+
+  /* ────────────────────────────────────────── */
+  /*  PAGE LAYOUT                               */
+  /* ────────────────────────────────────────── */
+  main {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: var(--gap-xl) var(--gap-l);
+  }
+  section {
+    padding: var(--gap-xl) 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  section:last-child { border-bottom: none; }
+
+  .prompt {
+    color: var(--fg-dim);
+    font-size: var(--fs-sm);
+    margin-bottom: var(--gap-m);
+    letter-spacing: 0.02em;
+  }
+  .prompt .user { color: var(--accent); }
+  .prompt .host { color: var(--fg); }
+  .prompt .path { color: var(--blue); }
+  .prompt .cmd { color: var(--fg); font-weight: 500; }
+
+  .section-label {
+    font-size: var(--fs-xs);
+    color: var(--fg-faint);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: var(--gap-s);
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 0.6em;
+    height: 1.1em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    animation: blink 1.1s steps(1) infinite;
+    margin-left: 2px;
+  }
+  :root[data-blink="false"] .cursor { animation: none; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ────────────────────────────────────────── */
+  /*  HERO                                      */
+  /* ────────────────────────────────────────── */
+  .hero {
+    padding-top: var(--gap-xl);
+  }
+  .hero-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-m);
+    flex-wrap: wrap;
+    margin-bottom: var(--gap-l);
+  }
+  .hero h1 {
+    font-family: var(--font-mono);
+    font-size: var(--fs-2xl);
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .hero h1 .bracket { color: var(--accent); }
+  .hero h1 .dim { color: var(--fg-dim); font-weight: 400; }
+  .hero-tag {
+    font-size: var(--fs-sm);
+    color: var(--fg-dim);
+    margin-top: var(--gap-m);
+    max-width: 60ch;
+    line-height: 1.7;
+  }
+
+  .ascii-banner {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.0;
+    color: var(--accent-dim);
+    white-space: pre;
+    margin: var(--gap-l) 0 var(--gap-l);
+    overflow-x: auto;
+    letter-spacing: 0;
+  }
+
+  /* stat strip under hero */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: var(--gap-l);
+  }
+  .stat {
+    background: var(--bg);
+    padding: var(--gap-m) var(--gap-l);
+  }
+  .stat-label {
+    font-size: var(--fs-xs);
+    color: var(--fg-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .stat-value {
+    font-size: var(--fs-lg);
+    color: var(--fg);
+    margin-top: 4px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-value .unit { color: var(--fg-dim); font-size: var(--fs-sm); margin-left: 4px; }
+
+  @media (max-width: 700px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .hero h1 { font-size: 32px; }
+    .ascii-banner { font-size: 7px; }
+  }
+
+  /* ────────────────────────────────────────── */
+  /*  WHOAMI                                    */
+  /* ────────────────────────────────────────── */
+  .whoami-grid {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: var(--gap-l);
+    margin-top: var(--gap-l);
+  }
+  .whoami-grid dt {
+    color: var(--fg-faint);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding-top: 3px;
+  }
+  .whoami-grid dd {
+    margin: 0;
+    color: var(--fg);
+    font-size: var(--fs-base);
+    border-bottom: 1px dotted var(--border);
+    padding-bottom: var(--gap-m);
+  }
+  .whoami-grid dd:last-of-type { border-bottom: none; }
+  .whoami-grid dd .k { color: var(--accent); }
+
+  .bio {
+    color: var(--fg);
+    max-width: 70ch;
+    line-height: 1.75;
+    font-size: var(--fs-base);
+    margin-top: var(--gap-l);
+  }
+  .bio .accent { color: var(--accent); }
+  .bio .dim { color: var(--fg-dim); }
+
+  /* ────────────────────────────────────────── */
+  /*  PROJECTS                                  */
+  /* ────────────────────────────────────────── */
+  .project-filters {
+    display: flex;
+    gap: var(--gap-m);
+    margin: var(--gap-l) 0;
+    font-size: var(--fs-sm);
+    flex-wrap: wrap;
+    color: var(--fg-dim);
+  }
+  .project-filters button {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--fg-dim);
+    padding: 4px 10px;
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    cursor: pointer;
+    border-radius: 0;
+    transition: all 0.12s;
+  }
+  .project-filters button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .project-filters button.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .project-filters .count { color: var(--fg-faint); margin-left: var(--gap-m); }
+
+  .projects-table {
+    border-top: 1px solid var(--border);
+  }
+  .project {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: var(--gap-m);
+    align-items: flex-start;
+    padding: var(--gap-m) 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .project:hover {
+    background: var(--bg-2);
+  }
+  .project:hover::before {
+    content: '▸';
+    position: absolute;
+    left: -16px;
+    top: var(--gap-m);
+    color: var(--accent);
+  }
+  .project-idx {
+    color: var(--fg-faint);
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  .project-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .project-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-m);
+    flex-wrap: wrap;
+  }
+  .project-title {
+    font-size: var(--fs-md);
+    color: var(--fg);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .project-type {
+    font-size: var(--fs-xs);
+    color: var(--fg-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .project-desc {
+    color: var(--fg-dim);
+    font-size: var(--fs-sm);
+    line-height: 1.6;
+    max-width: 72ch;
+  }
+  .project-meta {
+    display: flex;
+    gap: var(--gap-m);
+    margin-top: 6px;
+    font-size: var(--fs-xs);
+    color: var(--fg-faint);
+    flex-wrap: wrap;
+  }
+  .project-meta .tag {
+    color: var(--fg-dim);
+    border: 1px solid var(--border);
+    padding: 1px 8px;
+  }
+  .project-side {
+    text-align: right;
+    font-size: var(--fs-xs);
+    color: var(--fg-faint);
+    font-variant-numeric: tabular-nums;
+    min-width: 80px;
+  }
+  .project-side .status {
+    display: block;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+  .project-side .status.offline { color: var(--fg-faint); }
+
+  .project-detail {
+    grid-column: 1 / -1;
+    display: none;
+    padding: var(--gap-l) 0 var(--gap-m) 44px;
+    border-top: 1px dashed var(--border);
+    margin-top: var(--gap-m);
+    cursor: default;
+  }
+  .project.open .project-detail { display: block; }
+  .project.open::before { content: '▾'; }
+  .project.open { background: var(--bg-2); }
+
+  .project-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap-l);
+    margin-top: var(--gap-m);
+  }
+  .detail-block h4 {
+    font-size: var(--fs-xs);
+    color: var(--fg-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin: 0 0 var(--gap-s);
+    font-weight: 400;
+  }
+  .detail-block ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--fg);
+  }
+  .detail-block ul li {
+    padding: 3px 0;
+    border-bottom: 1px dotted var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: var(--gap-m);
+  }
+  .detail-block ul li .v { color: var(--fg-dim); }
+
+  .ascii-rack {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.15;
+    color: var(--fg-dim);
+    white-space: pre;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: var(--gap-m);
+    margin-top: var(--gap-m);
+    overflow-x: auto;
+  }
+  .ascii-rack .lit { color: var(--accent); }
+  .ascii-rack .hi { color: var(--fg); }
+
+  @media (max-width: 700px) {
+    .project-detail-grid { grid-template-columns: 1fr; }
+    .project-detail { padding-left: var(--gap-m); }
+    .project { grid-template-columns: 24px 1fr; }
+    .project-side { display: none; }
+  }
+
+  /* ────────────────────────────────────────── */
+  /*  SKILLS  (config-file style)               */
+  /* ────────────────────────────────────────── */
+  .skills-file {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    padding: var(--gap-l);
+    margin-top: var(--gap-l);
+    font-size: var(--fs-sm);
+    line-height: 1.85;
+    overflow-x: auto;
+  }
+  .skills-file .comment { color: var(--fg-faint); }
+  .skills-file .section-hdr {
+    color: var(--accent);
+    margin-top: var(--gap-m);
+    display: block;
+    font-weight: 500;
+  }
+  .skills-file .section-hdr:first-child { margin-top: 0; }
+  .skills-file .key { color: var(--fg); display: inline-block; min-width: 22ch; }
+  .skills-file .val { color: var(--fg-dim); }
+  .skills-file .val .lvl {
+    display: inline-block;
+    margin-left: var(--gap-s);
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+  .skills-file .val .lvl .off { color: var(--border-bright); }
+
+  /* ────────────────────────────────────────── */
+  /*  UPTIME / TIMELINE                         */
+  /* ────────────────────────────────────────── */
+  .timeline {
+    margin-top: var(--gap-l);
+  }
+  .timeline-row {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: var(--gap-l);
+    padding: var(--gap-m) 0;
+    border-bottom: 1px solid var(--border);
+    align-items: baseline;
+  }
+  .timeline-row:last-child { border-bottom: none; }
+  .timeline-date {
+    color: var(--fg-faint);
+    font-size: var(--fs-xs);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+  }
+  .timeline-body .t-title { color: var(--fg); font-size: var(--fs-md); font-weight: 500; }
+  .timeline-body .t-where { color: var(--accent); font-size: var(--fs-sm); margin-left: var(--gap-s); }
+  .timeline-body .t-desc { color: var(--fg-dim); font-size: var(--fs-sm); margin-top: 4px; line-height: 1.6; }
+  .timeline-side { color: var(--fg-faint); font-size: var(--fs-xs); font-variant-numeric: tabular-nums; text-align: right; }
+
+  @media (max-width: 700px) {
+    .timeline-row { grid-template-columns: 1fr; gap: 4px; }
+    .timeline-side { text-align: left; }
+  }
+
+  /* ────────────────────────────────────────── */
+  /*  CONTACT                                   */
+  /* ────────────────────────────────────────── */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: var(--gap-l);
+  }
+  .contact-cell {
+    background: var(--bg);
+    padding: var(--gap-l);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    transition: background 0.15s;
+    cursor: pointer;
+    position: relative;
+  }
+  .contact-cell:hover { background: var(--bg-2); }
+  .contact-cell .c-label {
+    font-size: var(--fs-xs);
+    color: var(--fg-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+  }
+  .contact-cell .c-value {
+    font-size: var(--fs-md);
+    color: var(--fg);
+    word-break: break-all;
+  }
+  .contact-cell .c-hint {
+    font-size: var(--fs-xs);
+    color: var(--accent);
+    margin-top: auto;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .contact-cell:hover .c-hint { opacity: 1; }
+  .contact-cell .c-copied {
+    position: absolute;
+    top: var(--gap-m);
+    right: var(--gap-m);
+    font-size: var(--fs-xs);
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .contact-cell.copied .c-copied { opacity: 1; }
+
+  /* ────────────────────────────────────────── */
+  /*  FOOTER                                    */
+  /* ────────────────────────────────────────── */
+  footer {
+    padding: var(--gap-xl) var(--gap-l);
+    max-width: 1040px;
+    margin: 0 auto;
+    font-size: var(--fs-xs);
+    color: var(--fg-faint);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--gap-m);
+  }
+  footer .heartbeat { color: var(--accent); }
+
+  /* ────────────────────────────────────────── */
+  /*  TWEAKS PANEL                              */
+  /* ────────────────────────────────────────── */
+  .tweaks {
+    position: fixed;
+    bottom: var(--gap-l);
+    right: var(--gap-l);
+    width: 280px;
+    background: var(--bg-2);
+    border: 1px solid var(--border-bright);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    z-index: 100;
+    display: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .tweaks.visible { display: block; }
+  .tweaks-head {
+    padding: 8px var(--gap-m);
+    background: var(--bg-3);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-xs);
+    color: var(--fg-dim);
+    letter-spacing: 0.05em;
+  }
+  .tweaks-head .dots { display: flex; gap: 4px; }
+  .tweaks-head .dots span { width: 9px; height: 9px; border-radius: 50%; background: var(--border-bright); }
+  .tweaks-head b { color: var(--fg); font-weight: 500; margin-left: var(--gap-s); flex: 1; }
+  .tweaks-body { padding: var(--gap-m); display: flex; flex-direction: column; gap: var(--gap-m); }
+  .tweak-row label {
+    display: block;
+    font-size: var(--fs-xs);
+    color: var(--fg-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 6px;
+  }
+  .tweak-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tweak-pills button {
+    flex: 1;
+    min-width: 40px;
+    background: transparent;
+    border: 1px solid var(--border-bright);
+    color: var(--fg-dim);
+    padding: 4px 8px;
+    font-family: inherit;
+    font-size: var(--fs-xs);
+    cursor: pointer;
+    border-radius: 0;
+    transition: all 0.12s;
+  }
+  .tweak-pills button:hover { color: var(--fg); border-color: var(--fg-dim); }
+  .tweak-pills button.on {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .tweak-swatch {
+    width: 100%; height: 20px;
+    border: 1px solid var(--border-bright);
+    display: inline-block;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- Terminal window chrome -->
+<div class="chrome">
+  <div class="chrome-dots"><span></span><span></span><span></span></div>
+  <div class="chrome-title">damien@lenormand: <b>~/portfolio</b> — zsh — 128×42</div>
+  <div class="chrome-status">
+    <span><span class="dot"></span>online</span>
+    <span id="clock">--:--:--</span>
+    <span id="uptime">up 0d</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!--  HERO                                               -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section class="hero" data-screen-label="01 hero">
+    <div class="prompt">
+      <span class="user">damien@lenormand</span><span class="host">:</span><span class="path">~</span><span class="host">$ </span><span class="cmd" id="typed-cmd"></span><span class="cursor"></span>
+    </div>
+
+    <div class="ascii-banner" aria-hidden="true">
+ ____    _    __  __ ___ _____ _   _     _     _____ _   _  ___  ____  __  __    _    _   _ ____
+|  _ \  / \  |  \/  |_ _| ____| \ | |   | |   | ____| \ | |/ _ \|  _ \|  \/  |  / \  | \ | |  _ \
+| | | |/ _ \ | |\/| || ||  _| |  \| |   | |   |  _| |  \| | | | | |_) | |\/| | / _ \ |  \| | | | |
+| |_| / ___ \| |  | || || |___| |\  |   | |___| |___| |\  | |_| |  _ <| |  | |/ ___ \| |\  | |_| |
+|____/_/   \_\_|  |_|___|_____|_| \_|___|_____|_____|_| \_|\___/|_| \_\_|  |_/_/   \_\_| \_|____/
+                                   |_____|</div>
+
+    <div class="hero-head">
+      <h1>
+        <span class="bracket">[</span>sysadmin<span class="bracket">/</span><span class="dim">infra-ops</span><span class="bracket">]</span>
+      </h1>
+    </div>
+
+    <p class="hero-tag">
+      Technicien systèmes &amp; réseaux — je monte, configure et maintiens le matériel qui fait tourner vos services. Postes de travail, serveurs en rack, switchs, firewalls. Là où ça chauffe, je débranche et rebranche correctement.
+    </p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Racks déployés</div>
+        <div class="stat-value" data-count="42">42</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Postes assemblés</div>
+        <div class="stat-value" data-count="380">380<span class="unit">+</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Années de métier</div>
+        <div class="stat-value" data-count="6">6</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Uptime visé</div>
+        <div class="stat-value">99.9<span class="unit">%</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!--  WHOAMI                                             -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section data-screen-label="02 whoami">
+    <div class="prompt">
+      <span class="user">damien@lenormand</span><span class="host">:</span><span class="path">~</span><span class="host">$ </span><span class="cmd">whoami --verbose</span>
+    </div>
+    <div class="section-label">// user profile</div>
+
+    <dl class="whoami-grid">
+      <dt>login</dt>          <dd><span class="k">damien.lenormand</span></dd>
+      <dt>rôle</dt>           <dd>Technicien Systèmes &amp; Réseaux</dd>
+      <dt>specialties</dt>    <dd>Hardware · Infrastructure · Assemblage · Maintenance</dd>
+      <dt>environnements</dt> <dd>Windows Server · Linux (Debian/Ubuntu) · VMware · pfSense</dd>
+      <dt>terrain</dt>        <dd>PME, salles serveur, racks 42U, baies réseau, postes utilisateurs</dd>
+      <dt>localisation</dt>   <dd>Normandie, FR — interventions sur site &amp; distance</dd>
+      <dt>status</dt>         <dd><span class="k">● disponible</span> — ouvert aux missions et postes</dd>
+    </dl>
+
+    <p class="bio">
+      J'aime <span class="accent">le matériel qui fonctionne</span>. Pas les slides, pas les buzzwords — un rack bien câblé, un
+      switch qui répond au bon VLAN, un serveur qui démarre au 3<sup>e</sup> essai parce qu'on a remplacé
+      <span class="dim">la bonne</span> barrette. Je travaille surtout sur de l'infra physique : montage de serveurs,
+      câblage structuré, déploiement de postes, supervision, remplacement à chaud.
+      Ce que je préfère, c'est le moment où tout le voyant est vert et que le ventilateur redescend en régime.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!--  PROJECTS                                           -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section data-screen-label="03 projects">
+    <div class="prompt">
+      <span class="user">damien@lenormand</span><span class="host">:</span><span class="path">~</span><span class="host">$ </span><span class="cmd">ls -la ./projects | grep -v draft</span>
+    </div>
+    <div class="section-label">// portfolio / interventions</div>
+
+    <div class="project-filters">
+      <button data-filter="all" class="active">all</button>
+      <button data-filter="rack">racks</button>
+      <button data-filter="poste">postes</button>
+      <button data-filter="network">réseau</button>
+      <button data-filter="maint">maintenance</button>
+      <span class="count" id="filter-count">6 projets</span>
+    </div>
+
+    <div class="projects-table" id="projects-table"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!--  SKILLS                                             -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section data-screen-label="04 skills">
+    <div class="prompt">
+      <span class="user">damien@lenormand</span><span class="host">:</span><span class="path">~</span><span class="host">$ </span><span class="cmd">cat /etc/skills.conf</span>
+    </div>
+    <div class="section-label">// competences.conf</div>
+
+    <div class="skills-file" id="skills-file"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!--  TIMELINE                                           -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section data-screen-label="05 history">
+    <div class="prompt">
+      <span class="user">damien@lenormand</span><span class="host">:</span><span class="path">~</span><span class="host">$ </span><span class="cmd">history | tail -n 20</span>
+    </div>
+    <div class="section-label">// parcours / timeline</div>
+
+    <div class="timeline" id="timeline"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!--  CONTACT                                            -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section data-screen-label="06 contact">
+    <div class="prompt">
+      <span class="user">damien@lenormand</span><span class="host">:</span><span class="path">~</span><span class="host">$ </span><span class="cmd">./contact.sh --all</span>
+    </div>
+    <div class="section-label">// ssh -l damien ...</div>
+
+    <div class="contact-grid">
+      <div class="contact-cell" data-copy="damien.lenormand@example.fr">
+        <div class="c-label">email</div>
+        <div class="c-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e88c8985818d86c6848d86879a8589868ca88d90898598848dc68e9a">[email&#160;protected]</a></div>
+        <div class="c-hint">cliquer pour copier ↵</div>
+        <div class="c-copied">✓ copié</div>
+      </div>
+      <div class="contact-cell" data-copy="+33 6 00 00 00 00">
+        <div class="c-label">tel</div>
+        <div class="c-value">+33 6 00 00 00 00</div>
+        <div class="c-hint">cliquer pour copier ↵</div>
+        <div class="c-copied">✓ copié</div>
+      </div>
+      <div class="contact-cell" onclick="window.open('https://linkedin.com', '_blank')">
+        <div class="c-label">linkedin</div>
+        <div class="c-value">/in/damien-lenormand</div>
+        <div class="c-hint">ouvrir ↗</div>
+      </div>
+      <div class="contact-cell" onclick="window.open('https://github.com', '_blank')">
+        <div class="c-label">github</div>
+        <div class="c-value">@dlenormand</div>
+        <div class="c-hint">ouvrir ↗</div>
+      </div>
+    </div>
+
+    <p class="bio" style="margin-top: var(--gap-l); color: var(--fg-dim); font-size: var(--fs-sm);">
+      <span style="color:var(--accent)">&gt;</span> Disponible pour missions, interventions ponctuelles ou postes en CDI.
+      <br><span style="color:var(--accent)">&gt;</span> Zone d'intervention : Normandie et Île-de-France, déplacements possibles.
+      <br><span style="color:var(--accent)">&gt;</span> Temps de réponse habituel : <span style="color:var(--fg)">&lt; 24h</span>.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <div>
+    <span class="heartbeat">●</span> damien@lenormand — build <span id="build-hash"></span> — © 2026
+  </div>
+  <div>
+    <span id="foot-latency">ping 12ms</span> · <span id="foot-mem">mem 64%</span> · <span>kernel 6.8.0-rackie</span>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!--  TWEAKS PANEL                                       -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="tweaks" id="tweaks">
+  <div class="tweaks-head">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <b>tweaks.sh</b>
+    <span>~/cfg</span>
+  </div>
+  <div class="tweaks-body">
+    <div class="tweak-row">
+      <label>accent_color</label>
+      <div class="tweak-pills" data-tweak="accent">
+        <button data-val="green">green</button>
+        <button data-val="amber">amber</button>
+        <button data-val="cyan">cyan</button>
+        <button data-val="magenta">magenta</button>
+      </div>
+    </div>
+    <div class="tweak-row">
+      <label>theme</label>
+      <div class="tweak-pills" data-tweak="theme">
+        <button data-val="dark">dark</button>
+        <button data-val="light">light</button>
+      </div>
+    </div>
+    <div class="tweak-row">
+      <label>density</label>
+      <div class="tweak-pills" data-tweak="density">
+        <button data-val="compact">compact</button>
+        <button data-val="comfortable">default</button>
+        <button data-val="spacious">spacious</button>
+      </div>
+    </div>
+    <div class="tweak-row">
+      <label>cursor_blink</label>
+      <div class="tweak-pills" data-tweak="show_blink_cursor">
+        <button data-val="true">on</button>
+        <button data-val="false">off</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" defer></script><script>
+/* ========================================================== */
+/*  DATA                                                      */
+/* ========================================================== */
+
+const PROJECTS = [
+  {
+    id: 'rack-pme',
+    cat: 'rack',
+    title: 'Migration baie 42U — PME industrielle',
+    type: 'rack / déploiement',
+    desc: 'Remplacement complet d\'une baie vieillissante vers une baie 42U moderne : 2 serveurs hyperviseurs, SAN, 2 switchs core, onduleur 3000VA. Câblage structuré refait intégralement, labellisation complète, bascule en une nuit sans interruption utilisateur le lendemain matin.',
+    meta: ['2025', 'Normandie', '58 users', 'VMware', 'Debian'],
+    specs: { 'châssis': 'Dell PowerEdge R650 ×2', 'hyperviseur': 'VMware ESXi 8', 'stockage': 'Dell ME5024 — 48TB', 'réseau': 'Aruba 6100 ×2', 'onduleur': 'APC SRT3000' },
+    stats: { 'uptime': '99.94% (12 mois)', 'downtime bascule': '3h40', 'câbles posés': '186 patches', 'incidents post-bascule': '0' },
+    rack: `
+┌──────────────────┐  42U
+│ ░ PATCH PANEL 48 │  U42
+│ ░ SWITCH CORE A  │  U41 <span class="lit">●</span>
+│ ░ SWITCH CORE B  │  U40 <span class="lit">●</span>
+│ ░                │  U39
+│ ░ FIREWALL       │  U38 <span class="lit">●</span>
+│ ░                │  U37
+│ ░ SERVER  R650-1 │  U36-33 <span class="lit">●</span>
+│ ░ SERVER  R650-2 │  U32-29 <span class="lit">●</span>
+│ ░                │  U28
+│ ░ SAN  ME5024    │  U27-24 <span class="lit">●</span>
+│ ░                │  U23
+│ ░ BACKUP  NAS    │  U22-21 <span class="lit">●</span>
+│ ░                │  U20-10
+│ ░ UPS  3000VA    │  U09-06 <span class="lit">●</span>
+│ ░ PDU            │  U05-01
+└──────────────────┘    GND`
+  },
+  {
+    id: 'workstations',
+    cat: 'poste',
+    title: 'Renouvellement parc — 80 postes',
+    type: 'postes / assemblage',
+    desc: 'Étude des besoins par pôle, assemblage de 80 postes fixes + 20 portables, déploiement par image WDS, préparation des accès AD et GPO, formation des utilisateurs pendant la bascule. Tout le parc recyclé dans la foulée avec une filière d\'écologie responsable.',
+    meta: ['2024', '100 machines', 'WDS', 'AD / GPO'],
+    specs: { 'postes fixes': 'i5-13500 / 16Go / NVMe 512', 'portables': 'ThinkPad T14 Gen 4', 'deploy': 'WDS + MDT', 'périph.': 'Écrans 27" × 2, dock USB-C' },
+    stats: { 'postes livrés': '100/100', 'délai total': '6 semaines', 'tickets post-livraison': '4', 'anciens postes recyclés': '92' }
+  },
+  {
+    id: 'vlan',
+    cat: 'network',
+    title: 'Segmentation réseau + pfSense',
+    type: 'réseau / sécurité',
+    desc: 'Refonte complète d\'un réseau plat en 8 VLANs (users, voip, iot, dmz, guest, prod, mgmt, backup), passage derrière un pfSense redondé en CARP. Règles firewall documentées, monitoring LibreNMS, reverse proxy pour les services exposés. Détection d\'une machine compromise dès la première semaine.',
+    meta: ['2024', 'pfSense', 'LibreNMS', '8 VLAN'],
+    specs: { 'firewall': 'pfSense CE 2.7 × 2 (CARP)', 'switchs': 'Aruba 2930F ×4', 'VLANs': '8', 'monitoring': 'LibreNMS + Grafana' },
+    stats: { 'règles firewall': '147', 'VLANs': '8', 'incidents bloqués (mois 1)': '3', 'uptime firewall': '99.99%' }
+  },
+  {
+    id: 'backup',
+    cat: 'maint',
+    title: 'Stratégie sauvegarde 3-2-1',
+    type: 'sauvegarde / pra',
+    desc: 'Mise en place d\'une politique 3-2-1 : sauvegardes locales Veeam sur NAS dédié, copie externalisée chiffrée sur site distant en fibre, bande LTO-9 pour l\'archivage légal. Tests de restauration mensuels documentés. Un ransomware simulé restauré en 2h17.',
+    meta: ['2025', 'Veeam', 'LTO-9', '48TB'],
+    specs: { 'backup': 'Veeam B&R v12', 'primary': 'Synology RS3621xs+ — 48TB', 'offsite': 'Site distant — fibre dédiée', 'archive': 'Bandothèque LTO-9' },
+    stats: { 'RPO': '15 min', 'RTO': '2h30', 'retention': '90j + archivage légal', 'taux succès backup': '100%' }
+  },
+  {
+    id: 'cable',
+    cat: 'rack',
+    title: 'Câblage structuré — 120 prises',
+    type: 'câblage / infra',
+    desc: 'Déploiement d\'un câblage Cat6a complet pour un nouveau bâtiment : 120 prises, 6 baies de brassage locales, jarretières par zone colorée, certification Fluke de chaque lien. Documentation AutoCAD fournie au client avec plan de labels.',
+    meta: ['2024', 'Cat6a', '120 prises', 'Fluke cert.'],
+    specs: { 'câbles': 'Cat6a F/UTP 305m × 14', 'panneaux': 'Patch 48p × 6', 'certification': 'Fluke DSX-5000', 'connecteurs': 'Keystone Cat6a' },
+    stats: { 'prises posées': '120', 'liens certifiés PASS': '120/120', 'km de câble': '~3.8 km', 'durée chantier': '12 jours' }
+  },
+  {
+    id: 'helpdesk',
+    cat: 'maint',
+    title: 'Helpdesk N1/N2 — 3 sites',
+    type: 'support / maintenance',
+    desc: 'Gestion quotidienne du support technique sur 3 sites géographiques. Traitement des tickets GLPI, interventions physiques, remplacement à chaud de composants (alimentations, disques, barrettes), documentation KB interne. Taux de résolution N1 autour de 82%.',
+    meta: ['ongoing', 'GLPI', '3 sites', '~180 users'],
+    specs: { 'ticketing': 'GLPI 10', 'sites couverts': '3', 'utilisateurs': '~180', 'SLA': 'N1 < 2h, N2 < 8h' },
+    stats: { 'tickets/mois': '~140', 'résolution N1': '82%', 'SLA respecté': '96%', 'satisfaction': '4.6/5' }
+  }
+];
+
+const SKILLS = [
+  { section: '[hardware]', items: [
+    ['assemblage pc / workstation', 4],
+    ['montage rack / serveur', 4],
+    ['diagnostic matériel', 4],
+    ['remplacement à chaud (hotswap)', 4],
+    ['câblage structuré cat6a/fibre', 3],
+    ['soudure / réparation carte', 2],
+  ]},
+  { section: '[systemes]', items: [
+    ['windows server 2019/2022', 4],
+    ['active directory / gpo', 3],
+    ['linux (debian, ubuntu, rhel)', 3],
+    ['vmware esxi / vcenter', 3],
+    ['proxmox ve', 3],
+    ['scripting (bash, powershell)', 3],
+  ]},
+  { section: '[reseau]', items: [
+    ['routage / vlan / trunk', 4],
+    ['switch aruba / hpe / cisco', 3],
+    ['firewall pfsense / opnsense', 3],
+    ['wifi / controller ubiquiti', 3],
+    ['vpn ipsec / wireguard', 3],
+    ['monitoring (librenms, zabbix)', 3],
+  ]},
+  { section: '[sauvegarde]', items: [
+    ['veeam backup & replication', 4],
+    ['nas synology / qnap', 4],
+    ['bandes lto / archivage', 3],
+    ['pra / plan de reprise', 3],
+  ]},
+  { section: '[soft_skills]', items: [
+    ['documentation rigoureuse', 4],
+    ['sang-froid en panne', 4],
+    ['pédagogie utilisateur', 3],
+    ['travail en astreinte', 4],
+  ]}
+];
+
+const TIMELINE = [
+  { date: '2024 — now',  title: 'Technicien systèmes & réseaux',      where: '— PME Normandie',            desc: 'Administration infra 3 sites · 180 utilisateurs · parc serveur physique + virtualisation.',  side: 'actif' },
+  { date: '2022 — 2024', title: 'Technicien support informatique',    where: '— ESN régionale',            desc: 'Interventions clients en PME : déploiement postes, petit réseau, maintenance curative.',        side: '' },
+  { date: '2020 — 2022', title: 'Technicien helpdesk',                where: '— Collectivité',             desc: 'Support N1/N2 sur un parc de 300 postes · GLPI · accompagnement utilisateurs.',                  side: '' },
+  { date: '2020',        title: 'BTS SIO option SISR',                where: '— Option Systèmes & Réseaux', desc: 'Obtention avec mention · projet de fin d\'études sur la supervision.',                          side: 'diplôme' },
+];
+
+/* ========================================================== */
+/*  RENDER                                                    */
+/* ========================================================== */
+
+function renderProjects(filter = 'all') {
+  const container = document.getElementById('projects-table');
+  const filtered = filter === 'all' ? PROJECTS : PROJECTS.filter(p => p.cat === filter);
+  document.getElementById('filter-count').textContent = `${filtered.length} projet${filtered.length > 1 ? 's' : ''}`;
+
+  container.innerHTML = filtered.map((p, idx) => `
+    <div class="project" data-id="${p.id}">
+      <div class="project-idx">${String(idx + 1).padStart(2, '0')}</div>
+      <div class="project-body">
+        <div class="project-head">
+          <div class="project-title">${p.title}</div>
+          <div class="project-type">// ${p.type}</div>
+        </div>
+        <div class="project-desc">${p.desc}</div>
+        <div class="project-meta">
+          ${p.meta.map(m => `<span class="tag">${m}</span>`).join('')}
+        </div>
+        <div class="project-detail">
+          <div class="project-detail-grid">
+            <div class="detail-block">
+              <h4>// specs</h4>
+              <ul>${Object.entries(p.specs).map(([k,v]) => `<li><span>${k}</span><span class="v">${v}</span></li>`).join('')}</ul>
+            </div>
+            <div class="detail-block">
+              <h4>// résultats</h4>
+              <ul>${Object.entries(p.stats).map(([k,v]) => `<li><span>${k}</span><span class="v">${v}</span></li>`).join('')}</ul>
+            </div>
+          </div>
+          ${p.rack ? `<div class="ascii-rack">${p.rack}</div>` : ''}
+        </div>
+      </div>
+      <div class="project-side">
+        ${p.meta[0] || ''}
+        <span class="status ${p.id === 'helpdesk' ? '' : 'offline'}">
+          ${p.id === 'helpdesk' ? '● live' : '● shipped'}
+        </span>
+      </div>
+    </div>
+  `).join('');
+
+  // bind expand clicks
+  container.querySelectorAll('.project').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.project-detail')) return;
+      el.classList.toggle('open');
+    });
+  });
+}
+
+function renderSkills() {
+  const el = document.getElementById('skills-file');
+  const lines = [];
+  lines.push('<span class="comment"># /etc/skills.conf — last edited ' + new Date().toISOString().slice(0,10) + '</span>');
+  lines.push('<span class="comment"># 4 = expert · 3 = solide · 2 = familier · 1 = débutant</span>');
+  lines.push('');
+  SKILLS.forEach(grp => {
+    lines.push(`<span class="section-hdr">${grp.section}</span>`);
+    grp.items.forEach(([name, lvl]) => {
+      const bars = '■'.repeat(lvl) + `<span class="off">${'□'.repeat(4-lvl)}</span>`;
+      lines.push(`  <span class="key">${name}</span><span class="val">= <span class="lvl">${bars}</span></span>`);
+    });
+  });
+  el.innerHTML = lines.join('\n');
+  el.style.whiteSpace = 'pre';
+}
+
+function renderTimeline() {
+  const el = document.getElementById('timeline');
+  el.innerHTML = TIMELINE.map(t => `
+    <div class="timeline-row">
+      <div class="timeline-date">${t.date}</div>
+      <div class="timeline-body">
+        <div><span class="t-title">${t.title}</span><span class="t-where">${t.where}</span></div>
+        <div class="t-desc">${t.desc}</div>
+      </div>
+      <div class="timeline-side">${t.side}</div>
+    </div>
+  `).join('');
+}
+
+/* ========================================================== */
+/*  INTERACTIONS                                              */
+/* ========================================================== */
+
+function bindFilters() {
+  document.querySelectorAll('.project-filters button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.project-filters button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderProjects(btn.dataset.filter);
+    });
+  });
+}
+
+function bindContactCopy() {
+  document.querySelectorAll('.contact-cell[data-copy]').forEach(cell => {
+    cell.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(cell.dataset.copy);
+        cell.classList.add('copied');
+        setTimeout(() => cell.classList.remove('copied'), 1500);
+      } catch(e) { /* fallback */ }
+    });
+  });
+}
+
+function typeCmd() {
+  const el = document.getElementById('typed-cmd');
+  const text = './start --mode portfolio';
+  let i = 0;
+  const tick = () => {
+    if (i <= text.length) {
+      el.textContent = text.slice(0, i);
+      i++;
+      setTimeout(tick, 40 + Math.random() * 60);
+    }
+  };
+  tick();
+}
+
+function clock() {
+  const clk = document.getElementById('clock');
+  const upt = document.getElementById('uptime');
+  const lat = document.getElementById('foot-latency');
+  const mem = document.getElementById('foot-mem');
+  const startDate = new Date('2020-09-01');
+  const tick = () => {
+    const now = new Date();
+    clk.textContent = now.toTimeString().slice(0,8);
+    const days = Math.floor((now - startDate) / (1000*60*60*24));
+    upt.textContent = `up ${days}d`;
+    // jitter latency / mem
+    lat.textContent = `ping ${(8 + Math.random()*8).toFixed(0)}ms`;
+    mem.textContent = `mem ${(60 + Math.random()*8).toFixed(0)}%`;
+  };
+  tick();
+  setInterval(tick, 1000);
+}
+
+function buildHash() {
+  const h = Array.from({length:7}, ()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+  document.getElementById('build-hash').textContent = h;
+}
+
+/* ========================================================== */
+/*  TWEAKS                                                    */
+/* ========================================================== */
+
+let tweakState = { ...TWEAK_DEFAULTS };
+
+function applyTweaks() {
+  const root = document.documentElement;
+  root.dataset.accent  = tweakState.accent;
+  root.dataset.theme   = tweakState.theme;
+  root.dataset.density = tweakState.density;
+  root.dataset.blink   = String(tweakState.show_blink_cursor);
+
+  // reflect pill state
+  document.querySelectorAll('.tweak-pills').forEach(grp => {
+    const key = grp.dataset.tweak;
+    grp.querySelectorAll('button').forEach(btn => {
+      const cur = String(tweakState[key]);
+      btn.classList.toggle('on', btn.dataset.val === cur);
+    });
+  });
+}
+
+function bindTweaks() {
+  document.querySelectorAll('.tweak-pills').forEach(grp => {
+    const key = grp.dataset.tweak;
+    grp.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        let v = btn.dataset.val;
+        if (v === 'true')  v = true;
+        if (v === 'false') v = false;
+        tweakState[key] = v;
+        applyTweaks();
+        try {
+          window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: v } }, '*');
+        } catch(e) {}
+      });
+    });
+  });
+}
+
+/* ========================================================== */
+/*  EDIT MODE PROTOCOL                                        */
+/* ========================================================== */
+
+window.addEventListener('message', (e) => {
+  const data = e.data;
+  if (!data || typeof data !== 'object') return;
+  if (data.type === '__activate_edit_mode') {
+    document.getElementById('tweaks').classList.add('visible');
+  } else if (data.type === '__deactivate_edit_mode') {
+    document.getElementById('tweaks').classList.remove('visible');
+  }
+});
+
+try {
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+} catch(e) {}
+
+/* ========================================================== */
+/*  INIT                                                      */
+/* ========================================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyTweaks();
+  renderProjects();
+  bindFilters();
+  renderSkills();
+  renderTimeline();
+  bindContactCopy();
+  bindTweaks();
+  typeCmd();
+  clock();
+  buildHash();
+});
+</script>
+
+</body>
+</html>
